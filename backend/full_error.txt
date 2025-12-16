@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "C:\Users\cgrub\OneDrive\Documents\geovisor\backend\test_db_models.py", line 6, in <module>
+    from app.models import user
+  File "C:\Users\cgrub\OneDrive\Documents\geovisor\backend\app\models\__init__.py", line 4, in <module>
+    from app.models.layer import Layer, LayerType, LayerFormat
+  File "C:\Users\cgrub\OneDrive\Documents\geovisor\backend\app\models\layer.py", line 30, in <module>
+    class Layer(Base):
+  File "C:\Users\cgrub\OneDrive\Documents\geovisor\backend\venv\Lib\site-packages\sqlalchemy\orm\decl_api.py", line 196, in __init__
+    _as_declarative(reg, cls, dict_)
+  File "C:\Users\cgrub\OneDrive\Documents\geovisor\backend\venv\Lib\site-packages\sqlalchemy\orm\decl_base.py", line 247, in _as_declarative
+    return _MapperConfig.setup_mapping(registry, cls, dict_, None, {})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\cgrub\OneDrive\Documents\geovisor\backend\venv\Lib\site-packages\sqlalchemy\orm\decl_base.py", line 328, in setup_mapping
+    return _ClassScanMapperConfig(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\cgrub\OneDrive\Documents\geovisor\backend\venv\Lib\site-packages\sqlalchemy\orm\decl_base.py", line 574, in __init__
+    self._extract_mappable_attributes()
+  File "C:\Users\cgrub\OneDrive\Documents\geovisor\backend\venv\Lib\site-packages\sqlalchemy\orm\decl_base.py", line 1507, in _extract_mappable_attributes
+    raise exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Attribute name 'metadata' is reserved when using the Declarative API.
