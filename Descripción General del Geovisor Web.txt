@@ -1,0 +1,247 @@
+Descripción General del Geovisor Web
+
+El sistema consiste en un geovisor web avanzado que permite la carga, visualización, análisis y medición de información georreferenciada en 2D y 3D, orientado a la gestión de proyectos técnicos, obras civiles, interventoría y análisis territorial.
+El geovisor funcionará completamente vía web y estará basado en una arquitectura moderna, con frontend desarrollado en Angular, servicios geoespaciales y control de acceso por proyectos.
+
+Objetivo del Sistema
+
+Proveer una plataforma web que permita a usuarios autorizados:
+
+Cargar archivos georreferenciados
+
+Visualizar información espacial en mapas 2D y 3D
+
+Realizar mediciones técnicas (distancias, áreas y volúmenes)
+
+Organizar la información por proyectos
+
+Controlar el acceso del personal por proyecto
+
+Centralizar la gestión de información geoespacial de forma segura y auditable
+
+Funcionalidades Principales del Sistema
+1. Gestión de Usuarios y Acceso
+
+El sistema contará con un módulo de autenticación controlada mediante códigos de acceso, suministrados exclusivamente por un administrador.
+
+Funcionalidades:
+
+Inicio de sesión mediante código único generado por el administrador
+
+Asociación del código a un usuario específico
+
+Validación de vigencia del código
+
+Acceso restringido únicamente a proyectos asignados
+
+Cierre de sesión y control de sesiones activas
+
+2. Panel de Administración
+
+El sistema contará con un panel administrativo con las siguientes capacidades:
+
+Gestión de usuarios:
+
+Crear, editar y desactivar usuarios
+
+Generar códigos de acceso únicos
+
+Asignar roles (administrador / usuario técnico)
+
+Asignar usuarios a uno o varios proyectos
+
+Gestión de proyectos:
+
+Crear, editar y desactivar proyectos
+
+Definir información general del proyecto (nombre, descripción, ubicación, fechas)
+
+Asignar personal autorizado a cada proyecto
+
+Controlar acceso a archivos y capas por proyecto
+
+3. Gestión de Proyectos
+
+Cada proyecto funcionará como una unidad independiente de información, con control total de acceso.
+
+Funcionalidades:
+
+Visualización del listado de proyectos asignados al usuario
+
+Acceso exclusivo a la información del proyecto
+
+Gestión de archivos geoespaciales por proyecto
+
+Historial de cargas y modificaciones
+
+4. Carga de Archivos Georreferenciados
+
+El sistema permitirá cargar y administrar múltiples tipos de archivos espaciales.
+
+Formatos soportados:
+
+Shapefile
+
+GeoJSON
+
+KML / KMZ
+
+CSV con coordenadas
+
+Modelos digitales de terreno (DEM)
+
+Nubes de puntos (si aplica a la fase 3D)
+
+Funcionalidades:
+
+Validación automática de sistema de coordenadas
+
+Reproyección de capas
+
+Organización por capas y grupos
+
+Activar / desactivar capas
+
+Configuración de simbología básica
+
+5. Visualización Cartográfica 2D
+
+El geovisor contará con un visor 2D interactivo que permita:
+
+Navegación (zoom, desplazamiento, centrado)
+
+Cambio de mapas base
+
+Visualización de múltiples capas
+
+Leyenda dinámica
+
+Consulta de atributos mediante clic
+
+Filtros por atributos
+
+Búsqueda espacial y alfanumérica
+
+6. Visualización y Análisis 3D
+
+El sistema incluirá un visor 3D para análisis avanzados del terreno y estructuras.
+
+Funcionalidades:
+
+Visualización de terreno en 3D
+
+Superposición de capas vectoriales sobre modelos de elevación
+
+Control de perspectiva, rotación y altura
+
+Visualización de modelos digitales de terreno y superficie
+
+Análisis visual de cortes y perfiles
+
+7. Herramientas de Medición 2D
+
+El sistema permitirá realizar mediciones técnicas directamente sobre el mapa.
+
+Mediciones disponibles:
+
+Medición de distancias lineales
+
+Medición de áreas poligonales
+
+Medición de perímetros
+
+Exportación de resultados de medición
+
+Las mediciones podrán:
+
+Guardarse asociadas al proyecto
+
+Visualizarse nuevamente
+
+Exportarse como archivo o reporte
+
+8. Herramientas de Medición 3D
+
+El geovisor incluirá herramientas avanzadas para medición tridimensional.
+
+Funcionalidades:
+
+Medición de distancias 3D
+
+Cálculo de áreas sobre superficies inclinadas
+
+Cálculo de volúmenes (corte y relleno)
+
+Análisis de diferencias de elevación
+
+Comparación entre superficies (cuando aplique)
+
+9. Gestión de Archivos y Capas por Proyecto
+
+Cada proyecto contará con un repositorio propio de archivos.
+
+Funcionalidades:
+
+Subida y eliminación de archivos
+
+Control de versiones
+
+Visualización del historial de cargas
+
+Asociación de archivos a usuarios
+
+Restricción de acceso por proyecto
+
+10. Arquitectura Tecnológica (Referencia)
+
+Frontend:
+
+Angular
+
+Librerías de mapas (OpenLayers / Cesium / Leaflet según módulo)
+
+Interfaz responsive
+
+Backend:
+
+API REST
+
+Gestión de usuarios, proyectos y permisos
+
+Servicios de procesamiento geoespacial
+
+Base de datos:
+
+PostgreSQL + PostGIS
+
+Almacenamiento de geometrías y metadatos
+
+Servicios geoespaciales:
+
+GeoServer o QGIS Server
+
+Publicación de capas WMS / WFS / WMTS
+
+11. Seguridad y Control
+
+Acceso restringido por código
+
+Control de permisos por proyecto
+
+Registro de acciones (logs)
+
+Separación de información entre proyectos
+
+Protección contra accesos no autorizados
+
+12. Escalabilidad y Evolución
+
+El sistema estará diseñado para:
+
+Integración futura con sistemas externos
+
+Incorporación de dashboards y KPIs
+
+Automatización de análisis espaciales
+
+Integración con plataformas de analítica y BI

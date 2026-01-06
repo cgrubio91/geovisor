@@ -1,0 +1,111 @@
+<div class="geovisor-container">
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <div class="left-section">
+      <button class="btn-icon" (click)="goBack()">
+        <span class="icon">⬅️</span> Volver
+      </button>
+      <div class="project-title" *ngIf="project">
+        <h1>{{ project.name }}</h1>
+        <span>{{ project.desc }}</span>
+      </div>
+    </div>
+
+    <div class="center-section toolbar">
+      <button class="tool-btn" [class.active]="false">
+        <span class="icon">📚</span> Capas
+      </button>
+      <button class="tool-btn" (click)="showMeasurements = !showMeasurements">
+        <span class="icon">📏</span> Mediciones
+      </button>
+      <button class="tool-btn">
+        <span class="icon">📤</span> Subir Archivo
+      </button>
+      <button class="tool-btn">
+        <span class="icon">📥</span> Exportar
+      </button>
+    </div>
+
+    <div class="right-section view-toggle">
+      <div class="toggle-group">
+        <button [class.active]="viewerMode === '2D'" (click)="setMode('2D')">2D</button>
+        <button [class.active]="viewerMode === '3D'" (click)="setMode('3D')">3D</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <!-- Left Sidebar (Layers) -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3>Capas del Proyecto</h3>
+        <span class="count">{{ layers.length }} capas disponibles</span>
+      </div>
+      
+      <div class="layer-list">
+        <div *ngFor="let layer of layers" class="layer-item">
+          <div class="layer-main">
+            <button class="visibility-btn" (click)="toggleLayer(layer)">
+              <span class="icon">{{ layer.visible ? '👁️' : '🙈' }}</span>
+            </button>
+            <div class="layer-info">
+              <span class="layer-icon" [style.background-color]="layer.color"></span>
+              <div class="layer-text">
+                <span class="name">{{ layer.name }}</span>
+                <span class="type">{{ layer.type }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="sidebar-footer">
+        <h4>Leyenda</h4>
+        <div class="legend-items">
+           <div *ngFor="let layer of layers" class="legend-item">
+             <span class="color-dot" [style.background-color]="layer.color"></span>
+             <span>{{ layer.name }}</span>
+           </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Map Viewers -->
+    <div class="map-viewport">
+      <div id="map2d" [class.hidden]="viewerMode !== '2D'" class="map-container"></div>
+      <div id="map3d" [class.hidden]="viewerMode !== '3D'" class="map-container"></div>
+      
+      <!-- Coordinate Info -->
+      <div class="coords-info">
+        Lat: 4.7110 Lon: -74.0721
+      </div>
+
+      <!-- Measurement Modal -->
+      <div class="measurement-modal card" *ngIf="showMeasurements">
+        <div class="modal-header">
+          <h4>Herramientas de Medición</h4>
+          <button class="close-btn" (click)="showMeasurements = false">×</button>
+        </div>
+        <div class="modal-body">
+          <button class="measure-btn outline">
+             <span>📏</span> Medir Distancia
+          </button>
+          <button class="measure-btn outline">
+             <span>⬡</span> Medir Área
+          </button>
+          <button class="measure-btn solid">
+             <span>📊</span> Calcular Volumen
+          </button>
+
+          <div class="active-measurement">
+             <h5>Medición actual</h5>
+             <div class="result-placeholder">
+               Selecciona el área para calcular volumen
+             </div>
+             <button class="btn btn-primary btn-full">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
