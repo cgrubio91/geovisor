@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AdminService } from '../../../services/admin.service';
+import { ProjectService } from '../../../services/project.service';
 
 @Component({
-    selector: 'app-admin-projects',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-admin-projects',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
     <div class="projects-container">
       <div class="list-header">
         <h2>Gestión de Proyectos</h2>
@@ -17,11 +19,33 @@ import { FormsModule } from '@angular/forms';
 
       <!-- Create/Edit Form -->
       <div class="card form-panel" *ngIf="showCreate">
-        <h3>Crear Nuevo Proyecto</h3>
+        <h3>{{ newProject.id ? 'Editar Proyecto' : 'Crear Nuevo Proyecto' }}</h3>
         <form (submit)="saveProject()">
-          <div class="form-group">
-            <label>Nombre del Proyecto</label>
-            <input type="text" [(ngModel)]="newProject.name" name="name" placeholder="Nombre del proyecto" class="form-control">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nombre del Proyecto</label>
+              <input type="text" [(ngModel)]="newProject.name" name="name" placeholder="Nombre del proyecto" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Ubicación</label>
+              <input type="text" [(ngModel)]="newProject.location" name="location" placeholder="Ciudad / Región" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Fecha de Inicio</label>
+              <input type="date" [(ngModel)]="newProject.start_date" name="start_date" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Etapa del Proyecto</label>
+              <select [(ngModel)]="newProject.stage" name="stage" class="form-control">
+                <option value="Planificación">Planificación</option>
+                <option value="Ejecución">Ejecución</option>
+                <option value="Finalizado">Finalizado</option>
+                <option value="Suspendido">Suspendido</option>
+              </select>
+            </div>
           </div>
           
           <div class="form-group">
@@ -33,14 +57,14 @@ import { FormsModule } from '@angular/forms';
             <label>Personal Asignado</label>
             <div class="checkbox-list">
               <label *ngFor="let u of availableUsers">
-                <input type="checkbox" (change)="toggleUser(u.id)"> {{ u.name }} ({{ u.role }})
+                <input type="checkbox" [checked]="selectedUserIds.has(u.id)" (change)="toggleUser(u.id)"> {{ u.full_name }} ({{ u.role }})
               </label>
             </div>
           </div>
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Crear</button>
-            <button type="button" class="btn btn-outline" (click)="showCreate = false">Cancelar</button>
+            <button type="submit" class="btn btn-primary">{{ newProject.id ? 'Guardar Cambios' : 'Crear' }}</button>
+            <button type="button" class="btn btn-outline" (click)="resetForm()">Cancelar</button>
           </div>
         </form>
       </div>
@@ -56,14 +80,14 @@ import { FormsModule } from '@angular/forms';
             </div>
           </div>
           <div class="item-actions">
-            <button class="btn-text edit">✏️ Editar</button>
-            <button class="btn-text delete">🚫 Desactivar</button>
+            <button class="btn-text edit" (click)="editProject(p)">✏️ Editar</button>
+            <button class="btn-text delete" (click)="deleteProject(p)">🚫 Desactivar</button>
           </div>
         </div>
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .list-header {
       display: flex;
       justify-content: space-between;
@@ -162,28 +186,99 @@ import { FormsModule } from '@angular/forms';
     .btn-text.delete {
       color: #f44336;
     }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
   `]
 })
 export class AdminProjectsComponent {
-    showCreate = false;
-    newProject = { name: '', description: '' };
+  showCreate = false;
+  newProject: any = { name: '', description: '', user_ids: [] };
+  selectedUserIds: Set<number> = new Set();
 
-    availableUsers = [
-        { id: 1, name: 'Administrador', role: 'admin' },
-        { id: 2, name: 'Juan Pérez', role: 'user' },
-        { id: 3, name: 'María González', role: 'user' }
-    ];
+  availableUsers: any[] = [];
+  projects: any[] = [];
 
-    projects = [
-        { id: 1, name: 'Proyecto Carretera Norte', users_count: 2, layers_count: 3 },
-        { id: 2, name: 'Urbanización El Bosque', users_count: 3, layers_count: 3 },
-        { id: 3, name: 'Minería Santa Rita', users_count: 2, layers_count: 3 }
-    ];
+  constructor(
+    private projectService: ProjectService,
+    private adminService: AdminService
+  ) { }
 
-    toggleUser(id: number) {
+  ngOnInit() {
+    this.loadProjects();
+    this.loadUsers();
+  }
+
+  loadProjects() {
+    this.adminService.getProjectsSummary().subscribe(data => {
+      this.projects = data;
+    });
+  }
+
+  loadUsers() {
+    this.adminService.getUsers().subscribe(data => {
+      this.availableUsers = data;
+    });
+  }
+
+  toggleUser(id: number) {
+    if (this.selectedUserIds.has(id)) {
+      this.selectedUserIds.delete(id);
+    } else {
+      this.selectedUserIds.add(id);
     }
+  }
 
-    saveProject() {
-        this.showCreate = false;
+  saveProject() {
+    const payload: any = {
+      name: this.newProject.name,
+      description: this.newProject.description,
+      location: this.newProject.location,
+      start_date: this.newProject.start_date,
+      stage: this.newProject.stage,
+      user_ids: Array.from(this.selectedUserIds)
+    };
+
+    if (this.newProject.id) {
+      this.projectService.updateProject(this.newProject.id, payload).subscribe(() => {
+        this.resetForm();
+        this.loadProjects();
+      });
+
+    } else {
+      // Create new
+      this.projectService.createProject(payload).subscribe(() => {
+        this.resetForm();
+        this.loadProjects();
+      });
     }
+  }
+
+  editProject(p: any) {
+    this.projectService.getProject(p.id).subscribe(details => {
+      this.newProject = {
+        ...details,
+        start_date: details.start_date ? details.start_date.split('T')[0] : ''
+      };
+      this.selectedUserIds = new Set(details.users?.map((u: any) => u.id) || []);
+      this.showCreate = true;
+    });
+  }
+
+  deleteProject(p: any) {
+    if (confirm(`¿Estás seguro de desactivar el proyecto ${p.name}?`)) {
+      this.projectService.updateProject(p.id, { status: 'inactive' }).subscribe(() => {
+        this.loadProjects();
+      });
+    }
+  }
+
+  resetForm() {
+    this.showCreate = false;
+    this.newProject = { name: '', description: '', user_ids: [] };
+    this.selectedUserIds.clear();
+  }
 }
+

@@ -1,18 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AdminService } from '../../../services/admin.service';
 
 @Component({
-    selector: 'app-admin-dashboard',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
-    <div class="dashboard-grid">
+  selector: 'app-admin-dashboard',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="dashboard-grid" *ngIf="stats">
       <!-- Stats Cards -->
       <div class="stat-card" [style.border-left-color]="'var(--primary)'">
         <div class="stat-info">
           <span class="label">Usuarios Activos</span>
-          <span class="value">3</span>
-          <span class="subtext">de 3 totales</span>
+          <span class="value">{{ stats.active_users }}</span>
+          <span class="subtext">de {{ stats.total_users }} totales</span>
         </div>
         <div class="stat-icon" [style.background-color]="'var(--primary)'">👤</div>
       </div>
@@ -20,7 +21,7 @@ import { CommonModule } from '@angular/common';
       <div class="stat-card" [style.border-left-color]="'var(--secondary)'">
         <div class="stat-info">
           <span class="label">Proyectos</span>
-          <span class="value">3</span>
+          <span class="value">{{ stats.total_projects }}</span>
           <span class="subtext">en el sistema</span>
         </div>
         <div class="stat-icon" [style.background-color]="'var(--secondary)'">📁</div>
@@ -29,7 +30,7 @@ import { CommonModule } from '@angular/common';
       <div class="stat-card" [style.border-left-color]="'var(--accent)'">
         <div class="stat-info">
           <span class="label">Capas Totales</span>
-          <span class="value">9</span>
+          <span class="value">{{ stats.total_layers }}</span>
           <span class="subtext">en todos los proyectos</span>
         </div>
         <div class="stat-icon" [style.background-color]="'var(--accent)'">📚</div>
@@ -38,14 +39,14 @@ import { CommonModule } from '@angular/common';
       <div class="stat-card" [style.border-left-color]="'#4caf50'">
         <div class="stat-info">
           <span class="label">Promedio Capas/Proyecto</span>
-          <span class="value">3.0</span>
+          <span class="value">{{ stats.avg_layers_per_project }}</span>
           <span class="subtext">capas por proyecto</span>
         </div>
         <div class="stat-icon" [style.background-color]="'#4caf50'">📈</div>
       </div>
     </div>
 
-    <div class="dashboard-rows">
+    <div class="dashboard-rows" *ngIf="stats">
       <div class="row-left">
         <!-- Distribution -->
         <div class="card panel">
@@ -53,23 +54,23 @@ import { CommonModule } from '@angular/common';
            <div class="dist-item">
              <div class="dist-info">
                <span>Administradores</span>
-               <span>1</span>
+               <span>{{ stats.user_distribution.admins }}</span>
              </div>
-             <div class="progress-bar"><div class="fill" [style.width]="'33%'" [style.background-color]="'var(--secondary)'"></div></div>
+             <div class="progress-bar"><div class="fill" [style.width.%]="(stats.user_distribution.admins / stats.total_users) * 100" [style.background-color]="'var(--secondary)'"></div></div>
            </div>
            <div class="dist-item">
              <div class="dist-info">
                <span>Usuarios Regulares</span>
-               <span>2</span>
+               <span>{{ stats.user_distribution.regular }}</span>
              </div>
-             <div class="progress-bar"><div class="fill" [style.width]="'66%'" [style.background-color]="'var(--primary)'"></div></div>
+             <div class="progress-bar"><div class="fill" [style.width.%]="(stats.user_distribution.regular / stats.total_users) * 100" [style.background-color]="'var(--primary)'"></div></div>
            </div>
            <div class="dist-item">
              <div class="dist-info">
                <span>Usuarios Inactivos</span>
-               <span>0</span>
+               <span>{{ stats.user_distribution.inactive }}</span>
              </div>
-             <div class="progress-bar"><div class="fill" [style.width]="'0%'"></div></div>
+             <div class="progress-bar"><div class="fill" [style.width.%]="stats.total_users > 0 ? (stats.user_distribution.inactive / stats.total_users) * 100 : 0"></div></div>
            </div>
         </div>
 
@@ -77,18 +78,11 @@ import { CommonModule } from '@angular/common';
         <div class="card panel">
            <h3>Actividad Reciente</h3>
            <div class="activity-list">
-             <div class="activity-item">
-               <span class="dot" [style.background-color]="'var(--secondary)'"></span>
+             <div class="activity-item" *ngFor="let act of stats.recent_activity">
+               <span class="dot" [style.background-color]="act.type === 'user' ? 'var(--secondary)' : 'var(--primary)'"></span>
                <div class="act-text">
-                 <p>Nuevo usuario creado: Juan Pérez</p>
-                 <span class="time">Hace 2 horas</span>
-               </div>
-             </div>
-             <div class="activity-item">
-               <span class="dot" [style.background-color]="'var(--primary)'"></span>
-               <div class="act-text">
-                 <p>Proyecto actualizado: Carretera Norte</p>
-                 <span class="time">Hace 5 horas</span>
+                 <p>{{ act.text }}</p>
+                 <span class="time">{{ act.time }}</span>
                </div>
              </div>
            </div>
@@ -96,45 +90,24 @@ import { CommonModule } from '@angular/common';
       </div>
 
       <div class="row-right">
-        <!-- Active Projects -->
-        <div class="card panel">
-          <h3>Proyectos Más Activos</h3>
-          <div class="active-list">
-             <div class="active-item">
-                <span class="number">1</span>
-                <div class="item-text">
-                  <p>Urbanización El Bosque</p>
-                  <span>3 usuarios • 3 capas</span>
-                </div>
-             </div>
-             <div class="active-item">
-                <span class="number">2</span>
-                <div class="item-text">
-                  <p>Proyecto Carretera Norte</p>
-                  <span>2 usuarios • 3 capas</span>
-                </div>
-             </div>
-          </div>
-        </div>
-
         <!-- System Status -->
         <div class="card panel status-panel">
           <h3>Estado del Sistema</h3>
           <div class="status-grid">
             <div class="status-item">
               <span class="status-dot online"></span>
-              <span>Sistema Operativo</span>
+              <span>Backend Conectado</span>
             </div>
             <div class="status-item">
               <span class="status-dot online"></span>
-              <span>Base de Datos Conectada</span>
+              <span>Base de Datos Operativa</span>
             </div>
           </div>
         </div>
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -238,37 +211,6 @@ import { CommonModule } from '@angular/common';
       font-size: 0.75rem;
       color: var(--gray-600);
     }
-    .active-list {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    .active-item {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    .active-item .number {
-      width: 30px;
-      height: 30px;
-      background: var(--primary);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-    .item-text p {
-      margin: 0;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-    .item-text span {
-      font-size: 0.75rem;
-      color: var(--gray-600);
-    }
     .status-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -291,4 +233,14 @@ import { CommonModule } from '@angular/common';
     }
   `]
 })
-export class AdminDashboardComponent { }
+export class AdminDashboardComponent implements OnInit {
+  stats: any = null;
+
+  constructor(private adminService: AdminService) { }
+
+  ngOnInit() {
+    this.adminService.getStats().subscribe(data => {
+      this.stats = data;
+    });
+  }
+}

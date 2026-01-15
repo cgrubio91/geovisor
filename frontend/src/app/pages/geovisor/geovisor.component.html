@@ -18,15 +18,26 @@
       <button class="tool-btn" (click)="showMeasurements = !showMeasurements">
         <span class="icon">📏</span> Mediciones
       </button>
-      <button class="tool-btn">
+      <button class="tool-btn" (click)="goToUpload()">
         <span class="icon">📤</span> Subir Archivo
-      </button>
-      <button class="tool-btn">
-        <span class="icon">📥</span> Exportar
       </button>
     </div>
 
+    <button class="tool-btn" (click)="zoomToAll()">
+      <span class="icon">🎯</span> Enfoque Total
+    </button>
+    <button class="tool-btn">
+      <span class="icon">📥</span> Exportar
+    </button>
+
     <div class="right-section view-toggle">
+      <div class="basemap-selector" *ngIf="viewerMode === '2D'">
+        <select (change)="switchBasemap($any($event.target).value)" [value]="currentBasemap">
+          <option *ngFor="let bm of basemaps" [value]="bm.id">
+            {{ bm.icon }} {{ bm.name }}
+          </option>
+        </select>
+      </div>
       <div class="toggle-group">
         <button [class.active]="viewerMode === '2D'" (click)="setMode('2D')">2D</button>
         <button [class.active]="viewerMode === '3D'" (click)="setMode('3D')">3D</button>
@@ -37,35 +48,158 @@
   <div class="main-layout">
     <!-- Left Sidebar (Layers) -->
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <h3>Capas del Proyecto</h3>
-        <span class="count">{{ layers.length }} capas disponibles</span>
+      <div class="sidebar-tabs">
+        <button [class.active]="activeTab === 'layers'" (click)="activeTab = 'layers'">Capas</button>
+        <button [class.active]="activeTab === 'measurements'" (click)="activeTab = 'measurements'">Mediciones</button>
+        <button [class.active]="activeTab === 'analysis'" (click)="activeTab = 'analysis'">Análisis</button>
       </div>
-      
-      <div class="layer-list">
-        <div *ngFor="let layer of layers" class="layer-item">
-          <div class="layer-main">
-            <button class="visibility-btn" (click)="toggleLayer(layer)">
-              <span class="icon">{{ layer.visible ? '👁️' : '🙈' }}</span>
-            </button>
-            <div class="layer-info">
-              <span class="layer-icon" [style.background-color]="layer.color"></span>
-              <div class="layer-text">
-                <span class="name">{{ layer.name }}</span>
-                <span class="type">{{ layer.type }}</span>
+
+      <div class="tab-content" *ngIf="activeTab === 'layers'">
+        <div class="sidebar-header">
+          <h3>Capas del Proyecto</h3>
+          <span class="count">{{ layers.length }} capas disponibles</span>
+        </div>
+
+        <!-- Temporal Comparison -->
+        <div class="temporal-comparison" *ngIf="layers.length >= 2">
+          <div class="section-title" (click)="showTemporalSlider = !showTemporalSlider">
+            <span>🕒 Comparativa Temporal</span>
+            <span class="chevron">{{ showTemporalSlider ? '▼' : '▶' }}</span>
+          </div>
+          <div class="comparison-body" *ngIf="showTemporalSlider">
+            <div class="layer-pickers">
+              <select [(ngModel)]="compareLayer1" (change)="updateTemporalComparison()">
+                <option [ngValue]="null">Capa A (Antigua)</option>
+                <option *ngFor="let l of layers" [ngValue]="l">{{ l.name }}</option>
+              </select>
+              <select [(ngModel)]="compareLayer2" (change)="updateTemporalComparison()">
+                <option [ngValue]="null">Capa B (Nueva)</option>
+                <option *ngFor="let l of layers" [ngValue]="l">{{ l.name }}</option>
+              </select>
+            </div>
+            <div class="slider-container" *ngIf="compareLayer1 && compareLayer2">
+              <input type="range" min="0" max="100" [(ngModel)]="temporalValue" (input)="updateTemporalComparison()">
+              <div class="labels">
+                <span>{{ compareLayer1.name }}</span>
+                <span>{{ compareLayer2.name }}</span>
               </div>
             </div>
           </div>
         </div>
+
+        <div class="layer-list">
+          <div *ngFor="let layer of layers" class="layer-item" (dblclick)="zoomToLayer(layer)">
+            <div class="layer-main">
+              <button class="visibility-btn" (click)="toggleLayer(layer)">
+                <span class="icon">{{ layer.visible ? '👁️' : '🙈' }}</span>
+              </button>
+              <div class="layer-info">
+                <span class="layer-icon" [style.background-color]="layer.color"></span>
+                <div class="layer-text">
+                  <span class="name">{{ layer.name }}</span>
+                  <span class="type">{{ layer.type }}</span>
+                </div>
+              </div>
+              <button class="zoom-btn mini" (click)="zoomToLayer(layer); $event.stopPropagation()" title="Zoom">
+                🔍
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
-      
+
+      <!-- Measurements Tab -->
+      <div class="tab-content" *ngIf="activeTab === 'measurements'">
+        <div class="sidebar-header">
+          <h3>Mediciones</h3>
+          <span class="count">{{ measurements.length }} mediciones guardadas</span>
+        </div>
+
+        <div class="m-list" *ngIf="measurements.length > 0; else noMeasurements">
+          <div *ngFor="let m of measurements" class="m-item" (dblclick)="zoomToMeasurement(m)">
+            <button class="visibility-btn mini" (click)="toggleMeasurement(m); $event.stopPropagation()">
+              <span class="icon">{{ m.visible ? '👁️' : '🙈' }}</span>
+            </button>
+            <span class="color-indicator" [style.background-color]="m.params?.color || '#ffcc33'"></span>
+            <div class="m-info">
+              <span class="m-name">{{ m.name }}</span>
+              <span class="m-val">{{ m.value | number:'1.2-2' }} {{ m.unit }}</span>
+              <span class="m-notes" *ngIf="m.notes">{{ m.notes }}</span>
+            </div>
+            <div class="m-actions">
+              <button class="zoom-btn mini" (click)="zoomToMeasurement(m); $event.stopPropagation()" title="Zoom">
+                <span class="icon">🔍</span>
+              </button>
+              <button class="delete-btn mini" (click)="deleteMeasurement(m.id); $event.stopPropagation()"
+                title="Eliminar">
+                <span class="icon">🗑️</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <ng-template #noMeasurements>
+          <div class="empty-state">No hay mediciones guardadas aún. Use las herramientas superiores para empezar.</div>
+        </ng-template>
+      </div>
+
+      <!-- Analysis Tab -->
+      <div class="tab-content" *ngIf="activeTab === 'analysis'">
+        <div class="sidebar-header">
+          <h3>Análisis de Interventoría</h3>
+        </div>
+        <div class="analysis-tools">
+          <div class="tool-card" (click)="startAnalysis('profile')"
+            [class.active]="activeMeasurement.type === 'profile'">
+            <span class="icon">📏</span>
+            <div class="details">
+              <strong>Perfil Longitudinal</strong>
+              <span>Elevación sobre eje</span>
+            </div>
+          </div>
+          <div class="tool-card" (click)="startAnalysis('volume')" [class.active]="activeMeasurement.type === 'volume'">
+            <span class="icon">⛰️</span>
+            <div class="details">
+              <strong>Cálculo de Volúmenes</strong>
+              <span>Corte y Relleno</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="analysis-results"
+          *ngIf="activeMeasurement.type === 'profile' || activeMeasurement.type === 'volume'">
+          <div class="active-analysis">
+            <h4>Acciones</h4>
+            <div class="actions">
+              <button class="btn-primary" (click)="executeAnalysis()"
+                [disabled]="!activeMeasurement.geometry">Calcular</button>
+              <button class="btn-secondary" (click)="saveMeasurement()"
+                [disabled]="!activeMeasurement.value">Guardar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="analysis-export" style="margin-top: 300px; padding: 20px; border-top: 1px solid var(--gray-200);">
+          <h4 style="font-size: 0.9rem; margin-bottom: 15px; color: var(--secondary);">Generar Reporte Final</h4>
+          <div class="export-actions" style="display: flex; gap: 10px;">
+            <button class="btn-icon" style="background: #1d6f42; flex: 1;" (click)="downloadReport('excel')">
+              Excel 📊
+            </button>
+            <button class="btn-icon" style="background: #a91e2c; flex: 1;" (click)="downloadReport('pdf')">
+              PDF 📑
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="sidebar-footer">
         <h4>Leyenda</h4>
         <div class="legend-items">
-           <div *ngFor="let layer of layers" class="legend-item">
-             <span class="color-dot" [style.background-color]="layer.color"></span>
-             <span>{{ layer.name }}</span>
-           </div>
+          <div *ngFor="let layer of layers" class="legend-item">
+            <span class="color-dot" [style.background-color]="layer.color"></span>
+            <span>{{ layer.name }}</span>
+          </div>
         </div>
       </div>
     </aside>
@@ -74,10 +208,42 @@
     <div class="map-viewport">
       <div id="map2d" [class.hidden]="viewerMode !== '2D'" class="map-container"></div>
       <div id="map3d" [class.hidden]="viewerMode !== '3D'" class="map-container"></div>
-      
+
       <!-- Coordinate Info -->
       <div class="coords-info">
-        Lat: 4.7110 Lon: -74.0721
+        {{ mousePosition }}
+      </div>
+
+      <!-- Analysis Results Overlay -->
+      <div class="analysis-overlay card"
+        *ngIf="showProfileChart || (activeMeasurement.type === 'volume' && analysisResult)">
+        <div class="overlay-header">
+          <h4>{{ activeMeasurement.type === 'profile' ? 'Perfil Longitudinal' : 'Análisis de Volúmenes' }}</h4>
+          <button class="close-btn" (click)="showProfileChart = false; analysisResult = null">×</button>
+        </div>
+
+        <div class="chart-container" [hidden]="!showProfileChart">
+          <canvas id="profileChart"></canvas>
+        </div>
+
+        <div class="analysis-summary" *ngIf="analysisResult">
+          <div class="stat" *ngIf="analysisResult.net !== undefined">
+            <span>Neto</span>
+            <strong>{{ analysisResult.net | number:'1.2-2' }} m³</strong>
+          </div>
+          <div class="stat" *ngIf="analysisResult.cut !== undefined">
+            <span>Corte</span>
+            <strong>{{ analysisResult.cut | number:'1.2-2' }} m³</strong>
+          </div>
+          <div class="stat" *ngIf="analysisResult.fill !== undefined">
+            <span>Relleno</span>
+            <strong>{{ analysisResult.fill | number:'1.2-2' }} m³</strong>
+          </div>
+          <div class="stat" *ngIf="analysisResult.length !== undefined">
+            <span>Longitud</span>
+            <strong>{{ analysisResult.length | number:'1.0-0' }} m</strong>
+          </div>
+        </div>
       </div>
 
       <!-- Measurement Modal -->
@@ -87,22 +253,55 @@
           <button class="close-btn" (click)="showMeasurements = false">×</button>
         </div>
         <div class="modal-body">
-          <button class="measure-btn outline">
-             <span>📏</span> Medir Distancia
-          </button>
-          <button class="measure-btn outline">
-             <span>⬡</span> Medir Área
-          </button>
-          <button class="measure-btn solid">
-             <span>📊</span> Calcular Volumen
-          </button>
+          <div class="tool-selection">
+            <button class="measure-btn outline" (click)="startMeasurement('distance')"
+              [class.active]="activeMeasurement.type === 'distance'">
+              <span>📏</span> Distancia (2D)
+            </button>
+            <button class="measure-btn outline" (click)="startMeasurement('area')"
+              [class.active]="activeMeasurement.type === 'area'">
+              <span>⬡</span> Área (2D)
+            </button>
+            <button class="measure-btn solid" (click)="startMeasurement('volume')"
+              [class.active]="activeMeasurement.type === 'volume'">
+              <span>📊</span> Volumen (3D)
+            </button>
+          </div>
 
-          <div class="active-measurement">
-             <h5>Medición actual</h5>
-             <div class="result-placeholder">
-               Selecciona el área para calcular volumen
-             </div>
-             <button class="btn btn-primary btn-full">Guardar</button>
+          <div class="style-controls" *ngIf="activeMeasurement.type">
+            <h5>Estilo de Medición</h5>
+            <div class="control-row">
+              <label>Color:</label>
+              <input type="color" [(ngModel)]="activeMeasurement.color">
+            </div>
+            <div class="control-row">
+              <label>Grosor:</label>
+              <input type="range" min="1" max="10" [(ngModel)]="activeMeasurement.width">
+              <span>{{ activeMeasurement.width }}px</span>
+            </div>
+            <div class="control-row">
+              <label>Tipo:</label>
+              <select [(ngModel)]="activeMeasurement.lineType">
+                <option value="solid">Sólido</option>
+                <option value="dashed">Segmentado</option>
+              </select>
+            </div>
+            <div class="control-row col">
+              <label>Notas / Etiquetas:</label>
+              <textarea [(ngModel)]="activeMeasurement.notes"
+                placeholder="Ej: Talud crítico, área de acopio..."></textarea>
+            </div>
+          </div>
+
+          <div class="active-measurement" *ngIf="activeMeasurement.type">
+            <h5>Resultado</h5>
+            <div class="result-placeholder">
+              <span *ngIf="activeMeasurement.value > 0">{{ activeMeasurement.value }} {{ activeMeasurement.unit
+                }}</span>
+              <span *ngIf="activeMeasurement.value == 0">Realice la medición en el mapa...</span>
+            </div>
+            <button class="btn btn-primary btn-full" (click)="saveMeasurement()"
+              [disabled]="activeMeasurement.value == 0">Guardar Medición</button>
           </div>
         </div>
       </div>

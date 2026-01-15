@@ -1,22 +1,35 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProjectService {
+    // SE QUITA LA BARRA FINAL AQUÍ
     private apiUrl = 'http://localhost:8000/api/v1/projects';
 
-    constructor() { }
+    constructor(private http: HttpClient) { }
+
+    getProjects(): Observable<any[]> {
+        // Agregamos / al final para evitar el redirect 307 de FastAPI
+        return this.http.get<any[]>(`${this.apiUrl}/`);
+    }
 
     getProject(id: number): Observable<any> {
-        // Mock for now
-        const projects = [
-            { id: 1, name: 'Proyecto Carretera Norte', desc: 'Km 0+000 a Km 15+500' },
-            { id: 2, name: 'Urbanización El Bosque', desc: '120 hectáreas' },
-            { id: 3, name: 'Minería Santa Rita', desc: 'Cálculo de volúmenes' }
-        ];
-        return of(projects.find(p => p.id === id));
+        // Antes era ${this.apiUrl}/${id} lo que causaba //id
+        return this.http.get<any>(`${this.apiUrl}/${id}`);
+    }
+
+    createProject(project: any): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/`, project);
+    }
+
+    updateProject(id: number, project: any): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/${id}`, project);
+    }
+
+    deleteProject(id: number): Observable<any> {
+        return this.http.delete<any>(`${this.apiUrl}/${id}`);
     }
 }

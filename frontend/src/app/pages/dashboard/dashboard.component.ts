@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { ProjectService } from '../../services/project.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -224,49 +225,40 @@ import { Router, RouterModule } from '@angular/router';
   `]
 })
 export class DashboardComponent {
-  projects = [
-    {
-      id: 1,
-      name: 'Proyecto Carretera Norte',
-      description: 'Levantamiento topográfico carretera norte - Km 0+000 a Km 15+500',
-      date: '14/11/2025',
-      people: 2,
-      status: 'Activo',
-      layers: [
-        { name: 'Eje de Carretera', color: '#FF671C' },
-        { name: 'Modelo Digital Terreno', color: '#6c757d' },
-        { name: 'Curvas de Nivel', color: '#8d6e63' }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Urbanización El Bosque',
-      description: 'Proyecto de urbanización - 120 hectáreas',
-      date: '30/11/2025',
-      people: 3,
-      status: 'Activo',
-      layers: [
-        { name: 'Límite de Proyecto', color: '#00C1D2' },
-        { name: 'Lotes', color: '#6c757d' },
-        { name: 'Vías Internas', color: '#FF671C' }
-      ]
-    },
-    {
-      id: 3,
-      name: 'Minería Santa Rita',
-      description: 'Cálculo de volúmenes de extracción',
-      date: '19/10/2025',
-      people: 2,
-      status: 'Activo',
-      layers: [
-        { name: 'Área de Concesión', color: '#00C1D2' },
-        { name: 'MDT Actual', color: '#6c757d' },
-        { name: 'Zonas de Extracción', color: '#FF671C' }
-      ]
-    }
-  ];
+  projects: any[] = [];
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private projectService: ProjectService
+  ) { }
+
+  ngOnInit() {
+    this.loadProjects();
+  }
+
+  loadProjects() {
+    this.projectService.getProjects().subscribe(data => {
+      // Map backend data to UI format if needed
+      // Backend returns: name, desc, created_at, layers, measurements, users
+      this.projects = data.map(p => ({
+        id: p.id,
+        name: p.name,
+        description: p.description || p.desc,
+        date: new Date(p.created_at || Date.now()).toLocaleDateString(),
+        people: p.users ? p.users.length : 0,
+        status: 'Activo', // Default status
+        layers: p.layers ? p.layers.map((l: any) => ({
+          name: l.name,
+          color: this.getRandomColor()
+        })) : []
+      }));
+    });
+  }
+
+  getRandomColor() {
+    const colors = ['#FF671C', '#6c757d', '#8d6e63', '#4caf50', '#2196f3', '#ff9800', '#00C1D2'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
 
   openProject(id: number) {
     this.router.navigate(['/viewer', id]);

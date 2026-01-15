@@ -9,6 +9,8 @@ class Project(Base):
     name = Column(String, index=True, nullable=False)
     description = Column(Text, nullable=True)
     location = Column(String, nullable=True)
+    start_date = Column(DateTime, default=datetime.utcnow)
+    stage = Column(String, default="Planificación") # Ej: Planificación, Ejecución, Finalizado
     created_at = Column(DateTime, default=datetime.utcnow)
     status = Column(String, default="active")
     

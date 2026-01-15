@@ -12,3 +12,10 @@ shapely
 python-dotenv
 alembic
 cors
+rasterio
+numpy
+scipy
+fiona
+pyogrio
+reportlab
+xlsxwriter

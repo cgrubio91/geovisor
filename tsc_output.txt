@@ -1,0 +1,14 @@
+frontend/src/app/pages/geovisor/geovisor.component.ts(1,61): error TS2792: Cannot find module '@angular/core'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/pages/geovisor/geovisor.component.ts(2,43): error TS2792: Cannot find module '@angular/common'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/pages/geovisor/geovisor.component.ts(3,29): error TS2792: Cannot find module '@angular/forms'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/pages/geovisor/geovisor.component.ts(4,40): error TS2792: Cannot find module '@angular/router'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/pages/geovisor/geovisor.component.ts(10,25): error TS2792: Cannot find module 'cesium'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/services/layer.service.ts(1,28): error TS2792: Cannot find module '@angular/core'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/services/layer.service.ts(2,28): error TS2792: Cannot find module '@angular/common/http'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/services/layer.service.ts(3,28): error TS2792: Cannot find module 'rxjs'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/services/measurement.service.ts(1,28): error TS2792: Cannot find module '@angular/core'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/services/measurement.service.ts(2,28): error TS2792: Cannot find module '@angular/common/http'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/services/measurement.service.ts(3,28): error TS2792: Cannot find module 'rxjs'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/services/project.service.ts(1,28): error TS2792: Cannot find module '@angular/core'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/services/project.service.ts(2,28): error TS2792: Cannot find module '@angular/common/http'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
+frontend/src/app/services/project.service.ts(3,28): error TS2792: Cannot find module 'rxjs'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?

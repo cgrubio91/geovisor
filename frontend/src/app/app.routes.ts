@@ -18,6 +18,7 @@ export const routes: Routes = [
             { path: 'dashboard', component: AdminDashboardComponent },
             { path: 'users', component: AdminUsersComponent },
             { path: 'projects', component: AdminProjectsComponent },
+            { path: 'files', loadComponent: () => import('./pages/admin/files/admin-files.component').then(m => m.AdminFilesComponent) },
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
         ]
     },

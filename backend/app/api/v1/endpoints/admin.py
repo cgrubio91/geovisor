@@ -1,14 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
-from typing import List, Any
-from app import schemas
-
-router = APIRouter()
+from typing import List, Any, Optional
 
 from sqlalchemy.orm import Session
 from app.api.deps import get_db
+from app import schemas
 from app.models.user import User
 from app.models.project import Project
 from app.models.layer import Layer
+from app.crud import crud_user
+
+router = APIRouter()
+
 
 @router.get("/stats", response_model=Any)
 def get_stats(db: Session = Depends(get_db)) -> Any:
@@ -36,7 +38,7 @@ def get_stats(db: Session = Depends(get_db)) -> Any:
 
 @router.get("/users", response_model=List[Any])
 def list_users(db: Session = Depends(get_db)) -> Any:
-    users = db.query(User).all()
+    users = crud_user.get_users(db)
     result = []
     for user in users:
         result.append({
@@ -45,14 +47,44 @@ def list_users(db: Session = Depends(get_db)) -> Any:
             "access_code": user.access_code,
             "role": "Admin" if user.is_admin else "User",
             "projects_count": len(user.projects),
-            "is_active": True
+            "is_active": user.is_active
         })
     return result
 
-@router.post("/users", response_model=Any)
-def create_user(user_in: Any, db: Session = Depends(get_db)) -> Any:
-    # This is a stub for now, but uses DB session
-    return {"message": "User creation endpoint ready"}
+@router.post("/users", response_model=schemas.User)
+def create_user(user_in: schemas.UserCreate, db: Session = Depends(get_db)) -> Any:
+    # Check if access code already exists
+    user = crud_user.get_user_by_access_code(db, access_code=user_in.access_code)
+    if user:
+        raise HTTPException(status_code=400, detail="The user with this access code already exists")
+    
+    return crud_user.create_user(db, user=user_in)
+
+@router.put("/users/{user_id}", response_model=schemas.User)
+def update_user(
+    user_id: int,
+    user_in: schemas.UserUpdate,
+    db: Session = Depends(get_db),
+) -> Any:
+    user = crud_user.get_user(db, user_id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user = crud_user.update_user(db, user_id=user_id, user_update=user_in)
+    return user
+
+@router.delete("/users/{user_id}")
+def delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+) -> Any:
+    # Check if user exists
+    user = crud_user.get_user(db, user_id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Hard delete for now, or could toggle is_active
+    crud_user.delete_user(db, user_id=user_id)
+    return {"status": "success", "message": "User deleted"}
 
 @router.get("/projects-summary", response_model=List[Any])
 def list_projects_summary(db: Session = Depends(get_db)) -> Any:

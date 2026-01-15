@@ -1,0 +1,8 @@
+Contents of '../Datos':
+ - LaMacarena1_DTM_export_FriOct21200159704772.tfw
+ - LaMacarena1_DTM_export_FriOct21200159704772.tif
+ - LaMacarena1_ElevationToolbox_export_FriOct21200154022855.tfw
+ - LaMacarena1_ElevationToolbox_export_FriOct21200154022855.tif
+ - LaMacarena1_Orthomosaic_export_SatOct22021601048539.tfw
+ - LaMacarena1_Orthomosaic_export_SatOct22021601048539.tif
+ - points.las

@@ -1,0 +1,22 @@
+Database contents (Layer table):
+ Name: AEROPUERTO PASTO.kmz
+ Path: uploads\AEROPUERTO PASTO.kmz
+ Name: AEROPUERTO PASTO.kmz
+ Path: uploads\AEROPUERTO PASTO.kmz
+ Name: LaMacarena1_Orthomosaic_export_SatOct22021601048539.tif
+ Path: uploads\LaMacarena1_Orthomosaic_export_SatOct22021601048539.tif
+ Name: LaMacarena1_DTM_export_FriOct21200159704772.tif
+ Path: ..\Datos\LaMacarena1_DTM_export_FriOct21200159704772.tif
+ Name: LaMacarena1_Orthomosaic_export_SatOct22021601048539.tif
+ Path: ..\Datos\LaMacarena1_Orthomosaic_export_SatOct22021601048539.tif
+
+Files in 'uploads':
+ - AEROPUERTO PASTO.kmz
+ - LaMacarena1_ElevationToolbox_export_FriOct21200154022855.tif
+ - LaMacarena1_Orthomosaic_export_SatOct22021601048539.tif
+ - Modelo3D_Orthomosaic-0-0_export_MonOct30215445815928.tif
+ - Modelo3D_Orthomosaic-1-1_export_MonOct30215445815928.tif
+ - Modelo3D_Orthomosaic-1-2_export_MonOct30215445815928.tif
+ - Modelo3D_Orthomosaic-2-1_export_MonOct30215445815928.tif
+ - Plano Zodme 1.dwg
+ - points.las

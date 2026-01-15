@@ -1,0 +1,12 @@
+Checking uploads folder:
+ - 'AEROPUERTO PASTO.kmz'
+ - 'LaMacarena1_ElevationToolbox_export_FriOct21200154022855.tif'
+ - 'LaMacarena1_Orthomosaic_export_SatOct22021601048539.tif'
+ - 'Modelo3D_Orthomosaic-0-0_export_MonOct30215445815928.tif'
+ - 'Modelo3D_Orthomosaic-1-1_export_MonOct30215445815928.tif'
+ - 'Modelo3D_Orthomosaic-1-2_export_MonOct30215445815928.tif'
+ - 'Modelo3D_Orthomosaic-2-1_export_MonOct30215445815928.tif'
+ - 'Plano Zodme 1.dwg'
+ - 'points.las'
+
+Checking Datos folder:
