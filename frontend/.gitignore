@@ -1,43 +1,55 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-
-# Compiled output
+# --- Estándar de Angular/Node ---
 /dist
 /tmp
 /out-tsc
 /bazel-out
-
-# Node
 /node_modules
+/.angular/cache
 npm-debug.log
 yarn-error.log
 
-# IDEs and editors
-.idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# --- Python y Backend ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+backend/requirements.txt.bak
 
-# Visual Studio Code
+# --- Seguridad y Configuración (¡Muy importante!) ---
+.env
+.env.local
+.env.*
+*.mpp
+*.mppx
+
+# --- Archivos de Carga y Datos Geográficos ---
+# Ignoramos las carpetas completas donde se suben archivos
+backend/uploads/
+backend/Datos/
+../Datos/
+
+# Ignoramos archivos por extensión por si acaso quedan sueltos
+*.kmz
+*.kml
+*.tif
+*.tiff
+*.shp
+*.dbf
+*.prj
+
+# --- IDEs y Editores ---
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 .history/*
+.idea/
+.project
+.settings/
 
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-__screenshots__/
-
-# System files
+# --- Sistema ---
 .DS_Store
 Thumbs.db
